@@ -8,7 +8,7 @@ viewer.setEDLEnabled(false);
 viewer.setBackground("gradient"); // ["skybox", "gradient", "black", "white"];
 viewer.loadSettingsFromURL();
 
-Potree.loadPointCloud("assets/testarea/index/cloud.js", "pointcloud", e => {
+Potree.loadPointCloud("assets/building/cloud.js", "Building : Bintulu Civil Hall", e => {
     let pointcloud = e.pointcloud;
     let material = pointcloud.material;
     viewer.scene.addPointCloud(pointcloud);
