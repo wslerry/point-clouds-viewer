@@ -1,7 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
+	<title>Point Clouds Viz</title>
+  <meta charset="utf-8">
+  <meta name="description" content="Potree Demo">
+  <meta name="author" content="Lerry William">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<meta property="og:title" content="Point Clouds Viz" />
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://lerryws.xyz/point-clouds-viewer" />
+	<meta property="og:image" content="https://lerryws.xyz/point-clouds-viewer/assets/img/viz.png" />
+	<meta property="og:description" content="Point clouds data visualization demo" />
+  <link rel="icon" href="img/lerry_head.png">
+  <link rel="stylesheet" type="text/css" href="libs/potree/potree.css">
+  <link rel="stylesheet" type="text/css" href="libs/jquery-ui/jquery-ui.min.css">
+  <link rel="stylesheet" type="text/css" href="libs/perfect-scrollbar/css/perfect-scrollbar.css">
+  <link rel="stylesheet" type="text/css" href="libs/openlayers3/ol.css">
+  <link rel="stylesheet" type="text/css" href="libs/spectrum/spectrum.css">
+  <link rel="stylesheet" type="text/css" href="libs/jstree/themes/mixed/style.css">
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"/>
 	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-125651421-1"></script>
 	<script>
 		 window.dataLayer = window.dataLayer || [];
@@ -9,23 +29,6 @@
 		 gtag('js', new Date());
 		 gtag('config', 'UA-125651421-1');
 	</script>
-
-    <meta charset="utf-8">
-    <meta name="description" content="Potree and three.js based SfM data visualization">
-    <meta name="author" content="Lerry William">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Point Clouds Viz</title>
-    <link rel="icon" href="img/baramexplorer.png">
-    <link rel="stylesheet" type="text/css" href="libs/potree/potree.css">
-    <link rel="stylesheet" type="text/css" href="libs/jquery-ui/jquery-ui.min.css">
-    <link rel="stylesheet" type="text/css" href="libs/perfect-scrollbar/css/perfect-scrollbar.css">
-    <link rel="stylesheet" type="text/css" href="libs/openlayers3/ol.css">
-    <link rel="stylesheet" type="text/css" href="libs/spectrum/spectrum.css">
-    <link rel="stylesheet" type="text/css" href="libs/jstree/themes/mixed/style.css">
-    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="css/main.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"/>
 </head>
 
 <body>
