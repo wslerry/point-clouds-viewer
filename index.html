@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-125651421-1"></script>
+	<script>
+		 window.dataLayer = window.dataLayer || [];
+		 function gtag(){dataLayer.push(arguments);}
+		 gtag('js', new Date());
+		 gtag('config', 'UA-125651421-1');
+	</script>
+
+    <meta charset="utf-8">
+    <meta name="description" content="Potree and three.js based SfM data visualization">
+    <meta name="author" content="Lerry William">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Point Clouds Viz</title>
+    <link rel="icon" href="img/baramexplorer.png">
+    <link rel="stylesheet" type="text/css" href="libs/potree/potree.css">
+    <link rel="stylesheet" type="text/css" href="libs/jquery-ui/jquery-ui.min.css">
+    <link rel="stylesheet" type="text/css" href="libs/perfect-scrollbar/css/perfect-scrollbar.css">
+    <link rel="stylesheet" type="text/css" href="libs/openlayers3/ol.css">
+    <link rel="stylesheet" type="text/css" href="libs/spectrum/spectrum.css">
+    <link rel="stylesheet" type="text/css" href="libs/jstree/themes/mixed/style.css">
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"/>
+</head>
+
+<body>
+	<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+	<script src="libs/jquery/jquery-3.1.1.min.js"></script>
+	<script src="libs/spectrum/spectrum.js"></script>
+	<script src="libs/perfect-scrollbar/js/perfect-scrollbar.jquery.js"></script>
+	<script src="libs/jquery-ui/jquery-ui.min.js"></script>
+	<script src="libs/three.js/build/three.min.js"></script>
+	<script src="libs/other/BinaryHeap.js"></script>
+	<script src="libs/tween/tween.min.js"></script>
+	<script src="libs/d3/d3.js"></script>
+	<script src="libs/proj4/proj4.js"></script>
+	<script src="libs/openlayers3/ol.js"></script>
+	<script src="libs/i18next/i18next.js"></script>
+	<script src="libs/jstree/jstree.js"></script>
+	<script src="libs/potree/potree.js"></script>
+	<script src="libs/plasio/js/laslaz.js"></script>
+	<script src="js/popper.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<!-- <script src="assets/03_POSES/cameras.js"></script> -->
+	<script src="js/leaflet.js"></script>
+	<script src="js/math.min.js"></script>
+
+	<!-- Bootstrap Layout -->
+	<nav class="navbar navbar-expand-lg navbar-light bg-light py-0" style="z-index:100;">
+		<a class="navbar-brand" href="#">
+			<img src="img/lerry_head.png"  height="51px" width:"52px" class="d-inline-block align-top">
+		</a>
+
+		<div class="d-flex justify-content-left nav-item">
+			<span class="navbar-text"><h4><b>point-clouds-viewer</b></h4></span>
+		</div>
+
+		<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse" id="navbarNavDropdown">
+			<!--Create class ml-auto for the navbar items you want on the right.-->
+			<ul class="navbar-nav ml-auto" >
+
+				<!-- lighting -->
+				<li class="nav-item">
+					<a class="nav-link" href="#" id="btntogglelighting">
+					  <span class="fa-stack fa-lg">
+						<i class="fa fa-square fa-stack-2x buttonbg"></i>
+						<i id="btnlightbulb" class="fa fa-lightbulb-o fa-stack-1x buttonfg"></i>
+					</span>
+					</a>
+				</li>
+
+				<!-- hight quality pointclouds -->
+				<li class="nav-item">
+					<a class="nav-link" href="#" id="btntoggleHQ">
+					  <span class="fa-stack fa-lg">
+						<i class="fa fa-square fa-stack-2x buttonbg"></i>
+						<i id="btnHQ" class="fa fa-star fa-stack-1x buttonfg"></i>
+					</span>
+					</a>
+				</li>
+
+				<!-- Tools-->
+				<li class="nav-item dropdown keep-open">
+					<a class="nav-link" href="#" role="button" data-toggle="dropdown" >
+						<span class="fa-stack fa-lg">
+							<i class="fa fa-square fa-stack-2x buttonbg"></i>
+							<i class="fa fa-wrench fa-stack-1x buttonfg"></i>
+							<i class="fa fa-sort-down fa-stack-1x buttonfg downchevron"></i>
+						</span>
+					</a>
+					<div class="dropdown-menu dropdown-menu-right">
+						<!--use font awesome icons-->
+						<a id="measheader" class="dropdown-item navbar-text" href="#"> <strong><span class="fa-stack fa-lg">
+							<i class="fa fa-square fa-stack-2x buttonbg"></i>
+							<i class="fa fa-wrench fa-stack-1x buttonfg"></i>
+						</span>Measurements</strong> </a>
+						<div class="dropdown-divider"></div>
+						<a class="dropdown-item navbar-text" href="#" id="measPoint"> <i class="fa fa-bullseye fa-fw fa-lg"></i> Point </a>
+						<a class="dropdown-item navbar-text" href="#" id="measDistance"> <i class="fa fa-arrows-h fa-fw fa-lg"></i> Distance </a>
+						<a class="dropdown-item navbar-text" href="#" id="measHeight"> <i class="fa fa-arrows-v fa-fw fa-lg"></i> Height </a>
+						<a class="dropdown-item navbar-text" href="#" id="measAngle"> <i class="fa fa-share-alt fa-fw fa-lg"></i> Area & Angles </a>
+						<a class="dropdown-item navbar-text" href="#" id="measClear"> <i class="fa fa-close fa-fw fa-lg"></i> Remove All</a>
+					</div>
+				</li>
+
+				<!-- Appearance-->
+				<li class="nav-item dropdown keep-open">
+					<a class="nav-link " href="#" role="button" data-toggle="dropdown" >
+						<span class="fa-stack fa-lg">
+							<i class="fa fa-square fa-stack-2x buttonbg"></i>
+							<i class="fa fa-paint-brush fa-stack-1x buttonfg"></i>
+							<i class="fa fa-sort-down fa-stack-1x buttonfg downchevron"></i>
+						</span>
+					</a>
+					<ul class="dropdown-menu dropdown-menu-right" >
+						<li id="appearanceheader"><a class="dropdown-item navbar-text" href="#"> <strong>
+							<span class="fa-stack fa-lg">
+							<i class="fa fa-square fa-stack-2x buttonbg"></i>
+							<i class="fa fa-paint-brush fa-stack-1x buttonfg"></i>
+							</span>
+							Appearance</strong> </a></li>
+
+						<li><div class="dropdown-divider"></div></li>
+
+						<li>
+							<a class="dropdown-item navbar-text" href="#">
+								<div class="input-group">
+									<span class="input-group-addon navbar-text" style="width:140px">Number Of Points:</span>
+									<input id="sliderPointBudgetValue" type="text" class="form-control" placeholder="1M">
+								</div>
+								<div id="sliderPointBudget"></div>
+							</a>
+						</li>
+
+						<li>
+							<a class="dropdown-item navbar-text" href="#">
+								<div class="input-group">
+									<span class="input-group-addon navbar-text" style="width:140px">Point Size:</span>
+									<input id="sliderPointSizeValue" type="text" class="form-control" placeholder="50">
+								</div>
+								<div id="sliderPointSize"></div>
+							</a>
+						</li>
+
+						<li><div class="dropdown-divider"></div></li>
+
+						<li class="dropdown-item navbar-text">
+							<div class="input-group">
+								<span class="input-group-addon navbar-text" style="width:140px">Color Blend:</span>
+								<input id="colorblendValue" type="text" class="form-control" placeholder="0">
+							</div>
+							<div id="sliderColorBlend"></div>
+							<div class="btn-group btn-group-justified" role="group" aria-label="Second group">
+								<button id="btnRGB" type="button" class="btn btn-secondary" >RGB</button>
+								<button id="btnBoth" type="button" class="btn btn-secondary" >Both</button>
+								<button id="btnElev" type="button" class="btn btn-secondary" >Elev</button>
+							</div>
+						</li>
+
+						<li><div class="dropdown-divider"></div></li>
+
+						<li><div class="dropdown-divider"></div></li>
+
+						<li>
+							<a class="dropdown-item navbar-text" href="#">
+								Colormap: <br>
+								<div class="btn-group btn-group-justified" role="group" aria-label="Second group">
+									<button id="btnColormap1" type="button" class="btn btn-secondary" >&nbsp</button>
+									<button id="btnColormap2" type="button" class="btn btn-secondary" >&nbsp</button>
+									<button id="btnColormap3" type="button" class="btn btn-secondary" >&nbsp</button>
+									<button id="btnColormap4" type="button" class="btn btn-secondary" >&nbsp</button>
+									<button id="btnColormap5" type="button" class="btn btn-secondary" >&nbsp</button>
+									<button id="btnColormap6" type="button" class="btn btn-secondary" >&nbsp</button>
+									<button id="btnColormap7" type="button" class="btn btn-secondary" >&nbsp</button>
+								</div>
+							</a>
+						</li>
+					</ul>
+				</li>
+
+			</ul>
+		</div>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+	</nav>
+
+	<div class="potree_container" style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px;" >
+		<div id="potree_render_area">
+		</div>
+		<!-- <div id="attribution" ><a>&nbsp</i>Lerry William &nbsp</a></div> -->
+	</div>
+
+	<script src="js/loadpointcloud.js"></script>
+	<script src="js/measure.js"></script>
+	<!-- <script src="js/addLeafletMap.js"></script> -->
+
+	<script>
+		var cmap=Potree.Gradients["RAINBOW"];
+
+		$('#measPoint').on('click', measPoint);
+		$('#measDistance').on('click', measDistance);
+		$('#measHeight').on('click', measHeight);
+		$('#measAngle').on('click', measAngle);
+		$('#measClear').on('click', measClear);
+
+		$('#btntogglelighting').on('click', toggleEDL);
+		$('#btntoggleHQ').on('click', toggleHQ);
+
+		$('#btnRGB').on('click', colorbyRGB);
+		$('#btnBoth').on('click', colorbyBoth);
+		$('#btnElev').on('click', colorbyElev);
+
+		$('#btnColormap1').on('click', changeColormap);
+		$('#btnColormap2').on('click', changeColormap);
+		$('#btnColormap3').on('click', changeColormap);
+		$('#btnColormap4').on('click', changeColormap);
+		$('#btnColormap5').on('click', changeColormap);
+		$('#btnColormap6').on('click', changeColormap);
+		$('#btnColormap7').on('click', changeColormap);
+
+		function toggleEDL(){
+			if (viewer.useEDL){
+				viewer.useEDL = false;
+				$('#btnlightbulb').removeClass('buttonfgclicked');
+			}
+			else {
+				viewer.useEDL = true;
+				$('#btnlightbulb').addClass('buttonfgclicked');
+
+			}
+		}
+
+		function toggleHQ(){
+			if (viewer.useHQ){
+				viewer.useHQ = false;
+				$('#btnHQ').removeClass('buttonfgclicked');
+			}
+			else {
+				viewer.useHQ = true;
+				$('#btnHQ').addClass('buttonfgclicked');
+			}
+		}
+
+		function changeColormap(){
+			switch(this.id){
+				case "btnColormap1":
+					cmap = Potree.Gradients["GRAYSCALE"];
+					break;
+				case "btnColormap2":
+					cmap = Potree.Gradients["INFERNO"];
+					break;
+				case "btnColormap3":
+					cmap = Potree.Gradients["PLASMA"];
+					break;
+				case "btnColormap4":
+					cmap = Potree.Gradients["RAINBOW"];
+					break;
+				case "btnColormap5":
+					cmap = Potree.Gradients["SPECTRAL"];
+					break;
+				case "btnColormap6":
+					cmap = Potree.Gradients["VIRIDIS"];
+					break;
+				case "btnColormap7":
+					cmap = Potree.Gradients["YELLOW_GREEN"];
+					break;
+			}
+			viewer.scene.pointclouds[0].material.gradient = cmap;
+		}
+
+		function colorbyRGB(){
+			viewer.scene.pointclouds.forEach( pc => pc.material.pointColorType = Potree.PointColorType.RGB );
+			$( "#sliderColorBlend" ).slider('value',0);
+			$( "#colorblendValue" ).val(0);
+			viewer.scene.pointclouds[0].material.weightElevation = 0;
+			viewer.scene.pointclouds[0].material.weightRGB = 1;
+		}
+		function colorbyElev(){
+			viewer.scene.pointclouds.forEach( pc => pc.material.pointColorType = Potree.PointColorType.ELEVATION );
+			$( "#sliderColorBlend" ).slider('value',100);
+			$( "#colorblendValue" ).val(100);
+			viewer.scene.pointclouds[0].material.weightElevation = 1;
+			viewer.scene.pointclouds[0].material.weightRGB = 0;
+		}
+		function colorbyBoth() {
+			viewer.scene.pointclouds.forEach(pc => pc.material.pointColorType = Potree.PointColorType.COMPOSITE);
+			$( "#sliderColorBlend" ).slider('value',50);
+			$( "#colorblendValue" ).val(50);
+			viewer.scene.pointclouds[0].material.weightElevation = 50/100;
+			viewer.scene.pointclouds[0].material.weightRGB = 50/100;
+
+		}
+
+		// function togglemap(){
+		//     if (mapshow){
+		//         $('#mapcontainer').hide();
+		//         mapshow = false;
+		//         $('#mapbutton').removeClass('buttonfgclicked');
+		//     }
+		//     else {
+		//         $('#mapcontainer').show();
+		//         mapshow = true;
+		//         $('#mapbutton').addClass('buttonfgclicked');
+		//     }
+		//
+		// }
+
+		$('#mapcontainer').on('click',triggermapresize);
+		function triggermapresize(){
+			mymap.invalidateSize();
+		}
+
+		$('.keep-open').on({
+			"shown.bs.dropdown": function() { $(this).attr('closable', false); },
+			"hide.bs.dropdown":  function() { return $(this).attr('closable') == 'true'; }
+		});
+
+		$('#measheader').on({
+			"click": function() {
+				$('.keep-open').attr('closable', true );
+				$(this).parent().attr('closable', true );
+			}
+		});
+
+		$('#appearanceheader').on({
+			"click": function() {
+				$('.keep-open').attr('closable', true );
+				$(this).parent().attr('closable', true );
+			}
+		});
+
+		$('#downloadheader').on({
+			"click": function() {
+				$('.keep-open').attr('closable', true );
+				$(this).parent().attr('closable', true );
+			}
+		});
+
+
+		$('.keep-open .nav-link').on({
+			"click": function() {
+				$('.keep-open').attr('closable', true );
+				$(this).parent().attr('closable', true );
+			}
+		});
+
+		var zlimits = [-0.8, 19.1];
+		$( "#minval" ).val( 0 );
+		$( "#maxval" ).val( 15 );
+
+		$( function() {
+			$( "#slider-range" ).slider({
+				range: true,
+				min: Math.floor(zlimits[0]*10)/10,
+				max: Math.ceil(zlimits[1]*10)/10,
+				values: [ Math.floor(zlimits[0]*10)/10, Math.ceil(zlimits[1]*10)/10 ],
+				step: 0.1,
+				slide: function( event, ui ) {
+					$( "#minval" ).val( ui.values[ 0 ]);
+					$( "#maxval" ).val( ui.values[ 1 ]);
+					viewer.scene.pointclouds[0].material.elevationRange = [ui.values[ 0 ], ui.values[ 1 ]];
+				}
+			});
+		} );
+		$( function() {
+			$( "#sliderColorBlend" ).slider({
+				range: false,
+				min: 0,
+				max: 100,
+				value: 0,
+				step: 5,
+				slide: function( event, ui ) {
+					$( "#colorblendValue" ).val( ui.value);
+					viewer.scene.pointclouds[0].material.weightElevation = ui.value/100;
+					viewer.scene.pointclouds[0].material.weightRGB = 1-ui.value/100;
+					viewer.scene.pointclouds.forEach(pc => pc.material.pointColorType = Potree.PointColorType.COMPOSITE);
+				}
+				}
+			);
+		} );
+		$( function() {
+			$( "#sliderImageOpacity" ).slider({
+					range: false,
+					min: 0,
+					max: 100,
+					value: 100,
+				slide: function( event, ui ) {
+					$( "#sliderImageOpacityValue" )
+						.val( ui.value.toString() + '%');
+					imageplane.children[0].material.opacity = ui.value/100;
+				}
+				}
+			);
+		} );
+
+		$( function() {
+			$( "#sliderPointBudget" ).slider({
+					range: false,
+					min: 1000000,
+					max: 10000000,
+					value: 1000000,
+					step: 500000,
+				slide: function( event, ui ) {
+					$( "#sliderPointBudgetValue" )
+						.val( (ui.value/1000000).toString() + 'M');
+					viewer.setPointBudget(ui.value);
+				}
+				}
+			);
+		} );
+
+		viewer.minNodeSize = 50;
+		$( function() {
+			$( "#sliderPointSize" ).slider({
+					range: false,
+					min: 0,
+					max: 400,
+					value: 50,
+				slide: function( event, ui ) {
+					$( "#sliderPointSizeValue" )
+						.val( ui.value);
+					viewer.minNodeSize = ui.value;
+				}
+				}
+			);
+		} );
+
+		// FUNCTION TO GET COLORMAPS TO MAKE IMAGE OF THEM
+		function printColorMap(){
+			var j=0;
+			for(j=0;j<7;j++) {
+				switch(j){
+					case 0:
+						cmap = Potree.Gradients["GRAYSCALE"];
+						break;
+					case 1:
+						cmap = Potree.Gradients["INFERNO"];
+						break;
+					case 2:
+						cmap = Potree.Gradients["PLASMA"];
+						break;
+					case 3:
+						cmap = Potree.Gradients["RAINBOW"];
+						break;
+					case 4:
+						cmap = Potree.Gradients["SPECTRAL"];
+						break;
+					case 5:
+						cmap = Potree.Gradients["VIRIDIS"];
+						break;
+					case 6:
+						cmap = Potree.Gradients["YELLOW_GREEN"];
+						break;
+				}
+
+				var i;
+				var strout = '';
+				nelements = cmap.length;
+				for (i = 0; i < nelements; i++) {
+					strout = strout + '\n' + (cmap[i][0].toString() + ',' + cmap[i][1].r.toString() + ',' + cmap[i][1].g.toString() + ',' + cmap[i][1].b.toString());
+				}
+				console.log(strout);
+
+			}
+		}
+
+	</script>
+
+</body>
+</html>
